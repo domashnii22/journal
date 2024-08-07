@@ -1,8 +1,9 @@
 import styles from './JournalForm.module.css';
 import Button from '../Button/Button';
-import { useEffect, useReducer, useRef } from 'react';
+import { useContext, useEffect, useReducer, useRef } from 'react';
 import { formReducer, INITIAL_STATE } from './JournalForm.state';
 import Input from '../Input/Input';
+import { UserContext } from '../../context/user.context';
 
 function JournalForm({onSubmit}) {
 	const [formState, dispatchForm] = useReducer(formReducer, INITIAL_STATE);
@@ -10,6 +11,7 @@ function JournalForm({onSubmit}) {
 	const titleRef = useRef();
 	const dateRef = useRef();
 	const postRef = useRef();
+	const {userId} = useContext(UserContext);
 
 	const focusError = (isValid) => {
 		switch(true) {
@@ -46,6 +48,10 @@ function JournalForm({onSubmit}) {
 		}
 	}, [isFormReadyToSubmit, onSubmit, values]);
 
+	useEffect(() => {
+		dispatchForm({type: 'SET_VALUE', payload: {userId}});
+	}, [userId]);
+
 	const onChange = (e) => {
 		dispatchForm({type: 'SET_VALUE', payload: {[e.target.name]: e.target.value}});
 	};
@@ -77,8 +83,7 @@ function JournalForm({onSubmit}) {
 			<textarea name='post' id='' cols={30} rows={10} ref={postRef} onChange={onChange} value={values.post} className={`${styles['input']} ${isValid.post ? '' : styles['invalid']}`}></textarea>
 			<Button text={'Сохранить'}></Button>
 		</form>
-		
 	);
 }
-
+			
 export default JournalForm;
