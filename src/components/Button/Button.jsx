@@ -1,9 +1,9 @@
 import './Button.css';
 
-function Button({text}) {
+function Button({children}) {
 
 	return (
-		<button className="button accent">{text}</button>
+		<button className="button accent">{children}</button>
 	);
 }
 

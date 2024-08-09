@@ -1,4 +1,4 @@
-import { useContext } from 'react';
+import { useContext, useMemo } from 'react';
 import { UserContext } from '../../context/user.context';
 import './JournalList.css';
 import CardButton from '../CardButton/CardButton';
@@ -15,9 +15,9 @@ function JournalList({items}) {
 		}
 	 };
 
-	const filteredItems = items
+	const filteredItems = useMemo(()=> items
 		.filter(el => el.userId === userId)
-		.sort(sortItems);
+		.sort(sortItems), [items, userId]); 
 
 	if (items.length === 0) {
 		return <p>Записей пока нет, добавьте первую</p>;
