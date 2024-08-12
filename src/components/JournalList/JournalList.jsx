@@ -4,7 +4,7 @@ import './JournalList.css';
 import CardButton from '../CardButton/CardButton';
 import JournalItem from '../JournalItem/JournalItem';
 
-function JournalList({items}) {
+function JournalList({items, setItem}) {
 	const { userId } = useContext(UserContext);
 
 	const sortItems = (a, b) => {
@@ -27,7 +27,7 @@ function JournalList({items}) {
 		<div className="journal-list">
 			{filteredItems
 				.map(el => (
-					<CardButton key={el.id}>
+					<CardButton key={el.id} onClick={() => setItem(el)}>
 						<JournalItem
 							title={el.title}
 							post={el.post}

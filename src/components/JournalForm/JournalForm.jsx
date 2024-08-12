@@ -5,7 +5,7 @@ import { formReducer, INITIAL_STATE } from './JournalForm.state';
 import Input from '../Input/Input';
 import { UserContext } from '../../context/user.context';
 
-function JournalForm({onSubmit}) {
+function JournalForm({onSubmit, data, onDelete}) {
 	const [formState, dispatchForm] = useReducer(formReducer, INITIAL_STATE);
 	const {isValid, isFormReadyToSubmit, values} = formState;
 	const titleRef = useRef();
@@ -28,6 +28,14 @@ function JournalForm({onSubmit}) {
 	};
 
 	useEffect(() => {
+		if (!data) {
+			dispatchForm({type: 'CLEAR'});
+			dispatchForm({type: 'SET_VALUE', payload: {userId}});
+		}
+		dispatchForm({type: 'SET_VALUE', payload: {...data}});
+	}, [data]);
+
+	useEffect(() => {
 		let timerId;
 		if (!isValid.date || !isValid.post || ! !isValid.title) {
 			focusError(isValid);
@@ -45,8 +53,9 @@ function JournalForm({onSubmit}) {
 		if (isFormReadyToSubmit) {
 			onSubmit(values);
 			dispatchForm({type: 'CLEAR'});
+			dispatchForm({type: 'SET_VALUE', payload: {userId}});
 		}
-	}, [isFormReadyToSubmit, onSubmit, values]);
+	}, [isFormReadyToSubmit, onSubmit, values, userId]);
 
 	useEffect(() => {
 		dispatchForm({type: 'SET_VALUE', payload: {userId}});
@@ -61,17 +70,26 @@ function JournalForm({onSubmit}) {
 		dispatchForm({type: 'SUBMIT'});
 	};
 
+	const deleteJournalItem = () => {
+		onDelete(data.id);
+		dispatchForm({ type: 'CLEAR' });
+		dispatchForm({ type: 'SET_VALUE', payload: { userId }});
+	};
+
 	return (
 		<form className={styles['journal-form']} onSubmit={addJournalItem}>	
-			<div>
+			<div className={styles['form-row']}>
 				<Input type='text' name='title' ref={titleRef} onChange={onChange} isValid={isValid.title} value={values.title} appearence={'title'}/>	
+				{data?.id && <button className={styles['delete']} type='button' onClick={deleteJournalItem}>
+					<img src='/archive.svg' alt='Кнопка удаления'></img>
+				</button>}
 			</div>
 			<div className={styles['form-row']}>
 				<label htmlFor="date" className={styles['form-label']}>
 					<img src='calendar.svg' alt='Иконка календаря'></img>
 					<span>Дата</span>
 				</label>
-				<Input type='date' name='date' id="date" ref={dateRef} onChange={onChange} isValid={isValid.date} value={values.date}/>
+				<Input type='date' name='date' id="date" ref={dateRef} onChange={onChange} isValid={isValid.date} value={values.date ? new Date(values.date).toISOString().slice(0, 10) : ''}/>
 			</div>
 			<div className={styles['form-row']}>
 				<label htmlFor="tag" className={styles['form-label']}>
